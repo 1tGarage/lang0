@@ -39,9 +39,29 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: rust
+        config: |
+          paths-ignore:
+            - 'target/**'
+            - '**/tests/**'
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Build with full dependencies
+      run: |
+        cargo clean
+        cargo build --all-features --all-targets
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:rust"
