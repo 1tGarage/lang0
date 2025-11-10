@@ -54,7 +54,8 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
+        restore-keys: |
+          ${{ runner.os }}-cargo-
     - name: Build with full dependencies
       run: cargo build --all-features --all-targets
 
