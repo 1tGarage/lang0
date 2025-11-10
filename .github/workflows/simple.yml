@@ -39,7 +39,7 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: rust
-        config: |
+        config:
           paths-ignore:
             - 'target/**'
             - '**/tests/**'
