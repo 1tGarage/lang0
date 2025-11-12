@@ -13,9 +13,7 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Build
@@ -34,14 +32,28 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: rust
-
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
-
+        config: |
+          paths-ignore:
+            - 'target/**'
+            - '**/tests/**'
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+    - name: Build with full dependencies
+      run: cargo build --all-features --all-targets
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:rust"
